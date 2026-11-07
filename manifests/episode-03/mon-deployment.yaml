@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-deployment
+  labels: 
+    app: django
+  annotations:
+    kubernetes.io/change-cause: "new version nginx:1.26"
+
+spec:
+  
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: django
+
+  template: 
+    metadata:
+      labels:
+        app: django
+      annotations:
+        kubernetes.io/change-cause: "new version nginx:1.26"
+
+    spec: 
+      containers: 
+        - name: django
+          image: nginx:1.26
+
+          ports: 
+            - containerPort: 80
+          
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+
+            periodSeconds: 10
+            failureThreshold: 2
+
+          readinessProbe: 
+            httpGet: 
+              path: / 
+              port: 80
+            initialDelaySeconds: 5 
+
+            periodSeconds: 5 
+            failureThreshold: 2 
+
+          env: 
+            - name: DEBUG 
+              valueFrom: 
+                configMapKeyRef:
+                  name: django-config 
+                  key: DEBUG
+            - name: ALLOWED_HOST 
+              valueFrom: 
+                configMapKeyRef:
+                  name: django-config 
+                  key: ALLOWED_HOST
+            - name: DATABASE_HOST 
+              valueFrom: 
+                configMapKeyRef:
+                  name: django-config 
+                  key: DATABASE_HOST
+
+            - name: SECRET_KEY 
+              valueFrom: 
+                secretKeyRef:
+                  name: django-secret 
+                  key: SECRET_KEY
+            - name:  DATABASE_PASSWORD 
+              valueFrom: 
+                secretKeyRef:
+                  name: django-secret 
+                  key:  DATABASE_PASSWORD
