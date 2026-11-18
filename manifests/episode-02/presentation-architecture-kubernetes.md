@@ -8,7 +8,7 @@ le Control Plane et les Worker Nodes.
 
 ## 1. Architecture générale
 
-![Architecture Kubernetes](../assets/images/architecture-kubernetes.png)
+![Architecture Kubernetes](../../assets/images/architecture-kubernetes.png)
 
 ## 2. Control Plane
 
